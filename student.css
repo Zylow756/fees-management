@@ -1,0 +1,400 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: hsl(184, 82%, 82%);
+    margin: 0;
+    padding: 30px;
+}
+
+h1 {
+    text-align: center;
+    color: #1f3c56;
+}
+
+h2 {
+    color: #1f3c56;
+    margin-top: 25px;
+}
+
+label {
+    display: inline-block;
+    width: 150px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+input,
+textarea {
+    width: 300px;
+    padding: 8px;
+    margin-bottom: 10px;
+    border: 1px solid #c24d4d;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+textarea {
+    height: 70px;
+    vertical-align: top;
+}
+
+button {
+    width: 150px;
+    padding: 10px 25px;
+    font-size: 16px;
+    cursor: pointer;
+    border: none;
+    border-radius:100px;
+}
+
+button:hover {
+    transform: scale(1.03);
+}
+
+#studentInfo {
+    margin-top: 15px;
+    padding: 20px;
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    line-height: 1.8;
+   
+    }
+
+    #studentInfo div {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 8px;
+}
+
+#studentInfo div b {
+    width: 150px;
+}
+
+
+#successMessage {
+    margin-top: 15px;
+    font-weight: bold;
+}
+
+.studentCard {
+    width: 350px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: rgb(189, 186, 196);
+    border: 1px solid #0c0c0c;
+    text-align: left;
+    border-radius:12px;
+    box-shadow: 0 4px 15px rgba(32, 31, 31, 0.2);
+     
+}
+.studentCard img {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 8%;
+    border: 2px solid#ddd;
+    display: block;
+    margin-bottom: 15px;
+}
+
+.formGroup {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+ }
+
+.formGroup label {
+    width: 160px;
+    margin-bottom: 0;
+}
+
+.formGroup input,
+.formGroup textarea {
+    width: 300px;
+}
+#studentList {
+    margin-top: 20px;
+}
+#studentList> div {
+
+  border: 1px solid #333;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: 8px;
+    background-color: #f5f5f5;
+}
+
+#studentList b {
+    display: inline-block;
+    margin-bottom: 5px;
+}
+
+.studentPhoto {
+    width: 80px !important;
+    height: 80px !important;
+    
+    object-fit: cover;
+    border-radius: 8px;
+    display: block;
+    margin-bottom: 15px;
+}
+.studentItem {
+    width: 90%px;
+    max-width: 900px;
+    margin: 20px auto;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    background: #f5f5f5;
+    display: flex;
+    gap: 15px;
+    align-items: stretch;
+    box-sizing: border-box;
+}
+
+.infoCard {
+    background: white;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    flex: 1px;
+   
+}
+
+.infoCard h3 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #ddd;
+}
+
+.infoCard p {
+    margin: 6px 0;
+    font-size: 14px;
+}
+
+.studentPhoto {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+.infoCard {
+    border: 1px solid #ccc;
+    padding: 15px;
+    margin: 10px 0;
+    border-radius: 8px;
+    background: #f9f9f9;
+}
+
+.infoCard h3 {
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
+.infoCard p {
+    margin: 6px 0;
+}
+
+.studentInfo {
+    background: lightblue;
+}
+
+.addressInfo {
+    background: lightgreen;
+}
+
+.qualificationInfo {
+    position: relative;
+    background: rgb(184, 184, 158);
+    padding-bottom: 50px;
+}
+
+/* Search & Count Header Styles */
+.listHeader {
+    width: 90%;
+    max-width: 900px;
+    margin: 20px auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#searchInput {
+    width: 250px;
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    outline: none;
+}
+
+#searchInput:focus {
+    border-color: #1f3c56;
+}
+
+/* 1. मुख्य सफ़ेद कार्ड को Relative बनाएँ */
+.studentItem {
+    position: relative !important;
+    padding-bottom: 55px !important; /* सफ़ेद कार्ड में नीचे बटन के लिए खाली जगह */
+}
+
+/* 2. अंदर के तीनों रंगीन कार्ड्स से Relative हटाएँ */
+.infoCard, .qualificationInfo, .studentInfo, .addressInfo {
+    position: static !important;
+}
+
+/* --- ONLY BUTTON DESIGN FIX --- */
+
+/* Save/Update बटन और Edit बटन का साइज़ और लुक एक जैसा करने के लिए */
+#saveStudentBtn, .editBtn {
+    padding: 8px 20px !important;
+    font-size: 14px !important;
+    font-weight: bold !important;
+    border: none !important;
+    border-radius: 6px !important;
+    cursor: pointer !important;
+    height: 42px !important;
+    box-sizing: border-box !important;
+}
+
+/* Save / Update Button Color */
+#saveStudentBtn {
+    background-color: #028017 !important;
+    color: white !important;
+}
+
+/* Edit Button Position & Color */
+.editBtn {
+    position: absolute !important;
+    bottom: 12px !important;
+    right: 15px !important;
+    background-color: #f39c12 !important;
+    color: white !important;
+}
+/* Fix button text breaking into two lines */
+#saveStudentBtn {
+    white-space: nowrap !important; /* टेक्स्ट को दो लाइनों में टूटने से रोकेगा */
+    width: auto !important;         /* टेक्स्ट के हिसाब से बटन की चौड़ाई अपने आप बढ़ेगी */
+    min-width: 150px !important;    /* मिनिमम साइज बनाए रखेगा */
+}
+
+* Card Action Buttons Container */
+.cardActions {
+    position: absolute !important;
+    bottom: 12px !important;
+    right: 15px !important;
+    display: flex !important;
+    gap: 8px !important;
+    z-index: 10 !important;
+}
+
+/* Print Button Style (Blue Color) */
+.printBtn {
+    background-color: #2980b9 !important;
+    color: white !important;
+}
+
+.printBtn:hover {
+    background-color: #1f618d !important;
+}
+
+/* Buttons Container - Bottom-Right Position */
+.cardActions {
+    position: absolute !important;
+    bottom: 12px !important;
+    right: 15px !important;
+    display: flex !important;
+    gap: 8px !important; /* दोनों बटन्स के बीच हल्की सी दूरी */
+    align-items: center !important;
+    z-index: 10 !important;
+}
+
+/* Edit and Print ID Buttons - Same Style */
+.cardActions .btnStyle, .editBtn, .printBtn {
+    position: static !important; /* पुराना पोजीशन रीसेट किया गया */
+    width: auto !important;
+    height: 36px !important;
+    padding: 6px 16px !important;
+    font-size: 13px !important;
+    font-weight: bold !important;
+    border: none !important;
+    border-radius: 6px !important;
+    cursor: pointer !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+/* Edit Button Color (Orange) */
+.editBtn {
+    background-color: #f39c12 !important;
+    color: white !important;
+}
+
+.editBtn:hover {
+    background-color: #d68910 !important;
+}
+
+/* Print ID Button Color (Blue) */
+.printBtn {
+    background-color: #2980b9 !important;
+    color: white !important;
+}
+
+.printBtn:hover {
+    background-color: #1f618d !important;
+}
+
+/* List Header Block - Flex Layout */
+.listHeader {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    background-color: #ffffff !important;
+    padding: 12px 20px !important;
+    border-radius: 8px !important;
+    border: 1px solid #dcdde1 !important;
+    margin-top: 25px !important;
+    margin-bottom: 20px !important;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05) !important;
+}
+
+.headerTitleGroup {
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+}
+
+.headerTitleGroup h2 {
+    margin: 0 !important;
+    font-size: 20px !important;
+    color: #1f3c56 !important;
+}
+
+/* Badge (Total Count) Design */
+.badge {
+    background-color: #1f3c56 !important;
+    color: #ffffff !important;
+    padding: 4px 12px !important;
+    border-radius: 20px !important;
+    font-size: 14px !important;
+    font-weight: bold !important;
+}
+
+/* Search Box Design */
+.searchGroup input {
+    width: 260px !important;
+    padding: 8px 14px !important;
+    margin-bottom: 0 !important; /* Extra bottom margin remove */
+    border: 1px solid #27ae60 !important;
+    border-radius: 6px !important;
+    font-size: 14px !important;
+    outline: none !important;
+}
+
+.searchGroup input:focus {
+    border-color: #219653 !important;
+    box-shadow: 0 0 5px rgba(39, 174, 96, 0.3) !important;
+}

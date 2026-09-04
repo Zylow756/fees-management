@@ -1,0 +1,170 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Student Fees System</title>
+</head>
+
+<body>
+
+    <h1>Student Fees System</h1>
+<label>Student Id:</label>
+<input type="text" id="studentId">
+<br><br>
+
+
+    <label>Student Name:</label>
+    <input type="text" id="studentName">
+    <br><br>
+
+    <label>Father Name:</label>
+    <input type="text" id="fatherName">
+    <br><br>
+
+    <label>Mobile Number:</label>
+<input type="tel" id="mobile">
+<br><br>
+
+<label>Email:</label>
+<input type="email" id = "email">
+<br><br>
+
+
+<label>Date of Birth</label>
+<input type ="date" id ="dob">
+<br><br>
+
+
+<div id="addressSection">
+
+<label> Flat/House No:</label>
+<input type="text" id="houseNo">
+<br><br>
+
+<label>Area & Locality</label>
+<textarea id="areaLocality"></textarea>
+<br><br>
+
+<label>District</label>
+<input type="text" id="district">
+<br><br>
+
+<label>Pin code</label>
+<input type="number" id="pin">
+</div>
+
+<button id="saveStudentBtn">Save Student</button>
+
+<h2> Student Details</h2>
+<div id="studentDetails"></div>
+
+
+
+
+
+<h2>Fill Fees Structute</h2>
+
+    <label>Course Type :</label>
+    <select id="course">
+        <option value="">Select Course</option>
+        <option value="10000"> Tally Prime</option>
+        <option value="15000"> Beginner Accounting Program</option>
+        <option value="18000"> Professional Accounting Program</option>
+        <option value="25000"> Master Accounting,Audit Program </option>
+    </select>
+    <br><br>
+
+    <label>Total Fees:</label>
+    <input type="number" id="totalFees" readonly>
+    <br><br>
+
+    <label>Discount:</label>
+    <input type="number" id="discount">
+    <br><br>
+
+<label>Final Fees:</label>
+    <input type="number" id="finalFees" readonly>
+    <br><br>
+
+<label>Received Fees:</label>
+    <input type="number" id="receivedFees">
+    <br><br>
+
+    
+
+    <label>Balance Fees:</label>
+    <input type="number" id="balanceFees" readonly>
+    <br><br>
+
+
+    <label>Payment Mode:</label>
+
+<select id="paymentMode">
+    <option value="">Select Payment Mode</option>
+    <option value="oneTime">One Time Payment</option>
+    <option value="installment">Installment</option>
+</select>
+
+<br><br>
+
+<div id="installmentSection" style="display:none;">
+
+    <h3>Installment Plan</h3>
+
+    <label>Installment 1 Date:</label>
+    <input type="date" id="installmentDate1">
+
+    <label>Amount:</label>
+    <input type="number" id="installmentAmount1">
+
+    <br><br>
+
+    <label>Installment 2 Date:</label>
+    <input type="date" id="installmentDate2">
+
+    <label>Amount:</label>
+    <input type="number" id="installmentAmount2">
+
+    <br><br>
+
+    <label>Installment 3 Date:</label>
+    <input type="date" id="installmentDate3">
+
+    <label>Amount:</label>
+    <input type="number" id="installmentAmount3">
+
+<br><br>
+
+<label>Installment 4 Date:</label>
+    <input type="date" id="installmentDate4">
+
+    <label>Amount:</label>
+    <input type="number" id="installmentAmount4">
+
+<br><br>
+
+<label>Installment 5 Date:</label>
+    <input type="date" id="installmentDate5">
+
+    <label>Amount:</label>
+    <input type="number" id="installmentAmount5">
+
+<br><br>
+
+
+</div>
+ 
+
+<button id="calculateBtn">Calculate</button>
+
+    <h2>Fees Status</h2>
+    <p id="feesStatus"></p>
+
+    <h2>Student Result</h2>
+    <div id="studentResult"></div>
+
+
+    <script src="script.js"></script>
+
+</body>
+</html>
