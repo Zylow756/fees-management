@@ -5,6 +5,7 @@ let studentId = document.getElementById("studentId");
 let saveStudentBtn = document.getElementById("saveStudentBtn");
 let searchInput = document.getElementById("searchInput");
 
+<<<<<<< HEAD
 // admission date //
  
 // 1. सेलेक्ट एलिमेंट को चुना
@@ -30,6 +31,8 @@ selectElement.appendChild(newOption);
 // 5. इसे ऑटो सिलेक्ट (Auto-Select) कर दिया
 selectElement.value = formattedDate;
 
+=======
+>>>>>>> cd1b5212285fdf90353b59eba3321887af7d772f
 // Serial Number & Dates Setup
 let today = new Date();
 let month = today.getMonth() + 1;
