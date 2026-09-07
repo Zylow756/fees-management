@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Details</title>
+    <link rel="stylesheet" href="student.css">
+</head>
+
+<body>
+
+    <div class="studentCard">
+        <h1>Student Management System</h1>
+
+        <div class="fromGroup">
+            <label>Admission Date</label>
+            <select id="admissionDate">
+             <option value="-"> --Auto Fill--</option>
+        
+            </select>
+        
+            </div>
+            
+
+        <div class="formGroup">
+            <label>Student ID:</label>
+            <input type="text" id="studentId" readonly>
+        </div>
+<div class="formGroup">
+    <label for="courseName">Course Type</label>
+    <select id="courseName">
+        <option value="">-- Select Course --</option>
+        <option value="Tally Prime">Tally Prime</option>
+        <option value="Beginner Accounting Course">BEGINNER ACCOUNTING COURSE</option>
+        <option value="Professional Accounting Program">PROFESSIONAL ACCOUNTING PROGRAM</option>
+        <option value="Master Accounting, Finance & Audit Program">MASTER ACCOUNTING, FINANCE & AUDIT PROGRAM</option>
+    </select>
+</div>
+
+        <div class="formGroup">
+            <label>Student Name</label>
+            <input type="text" id="studentName">
+        </div>
+
+        <div class="formGroup">
+            <label>Student Photo</label>
+            <input type="file" id="studentPhoto" accept="image/*">
+        </div>
+
+        <div class="formGroup">
+            <label>Father Name</label>
+            <input type="text" id="fatherName">
+        </div>
+
+        <div class="formGroup">
+            <label>Mobile Number</label>
+            <input type="tel" id="mobile">
+        </div>
+
+        <div class="formGroup">
+            <label>Email</label>
+            <input type="email" id="email">
+        </div>
+
+        <div class="formGroup">
+            <label>Date of Birth</label>
+            <input type="date" id="dob">
+        </div>
+
+        <h2>Address</h2>
+
+        <div class="formGroup">
+            <label>Flat/House No.</label>
+            <input type="text" id="houseNo">
+        </div>
+
+        <div class="formGroup">
+            <label>Area & Locality</label>
+            <textarea id="areaLocality"></textarea>
+        </div>
+
+        <div class="formGroup">
+            <label>District</label>
+            <input type="text" id="district">
+        </div>
+
+        <div class="formGroup">
+            <label>Pin Code</label>
+            <input type="text" id="pin">
+        </div>
+
+        <div class="educationCard">
+            <h2>Education Detail</h2>
+
+            <div class="formGroup">
+                <label>Qualification</label>
+                <select id="qualification">
+                    <option value="">Select Qualification</option>
+                    <option value="12th">12th Passed</option>
+                    <option value="Graduation">Graduation</option>
+                    <option value="Post-Graduation">Post-Graduation</option>
+                    <option value="ITI">ITI</option>
+                    <option value="B.Tech">B.Tech</option>
+                    <option value="Other">OTHER</option>
+                </select>
+            </div>
+
+            <div class="formGroup">
+                <label>Stream</label>
+                <select id="steam">
+                    <option value="">Select Stream</option>
+                    <option value="Arts">Arts</option>
+                    <option value="Commerce">Commerce</option>
+                    <option value="Science">Science</option>
+                </select>
+            </div>
+
+            <div class="formGroup">
+                <label>Board / University</label>
+                <input type="text" id="board">
+            </div>
+
+            <div class="formGroup">
+                <label>Passing Year</label>
+                <input type="text" id="passingYear">
+            </div>
+
+            <div class="formGroup">
+                <label>Percentage</label>
+                <input type="text" id="percentage">
+            </div>
+        </div>
+
+        <!-- Hidden input for Edit Index -->
+        <input type="hidden" id="editIndex" value="-1">
+
+        <button id="saveStudentBtn">Save Student</button>
+        <p id="successMessage"></p>
+    </div>
+
+    <!-- Search and Count Header Block -->
+<div class="listHeader">
+    <div class="headerTitleGroup">
+        <h2>Student List</h2>
+        <span class="badge" id="totalCount">0</span>
+    </div>
+    <div class="searchGroup">
+        <input type="text" id="searchInput" placeholder="Search by Name or ID...">
+    </div>
+
+    </div>
+
+    <h2>Student List</h2>
+    <div id="studentList"></div>
+
+    <script src="student.js"></script>
+</body>
+
+</html>
