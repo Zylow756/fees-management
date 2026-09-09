@@ -5,34 +5,23 @@ let studentId = document.getElementById("studentId");
 let saveStudentBtn = document.getElementById("saveStudentBtn");
 let searchInput = document.getElementById("searchInput");
 
-<<<<<<< HEAD
-// admission date //
- 
-// 1. सेलेक्ट एलिमेंट को चुना
+// Admission Date Setup
 const selectElement = document.getElementById("admissionDate");
+if (selectElement) {
+    const todayDate = new Date();
+    const day = String(todayDate.getDate()).padStart(2, '0');
+    const monthVal = String(todayDate.getMonth() + 1).padStart(2, '0');
+    const yearVal = todayDate.getFullYear();
+    const formattedDate = `${day}/${monthVal}/${yearVal}`;
 
-// 2. कंप्यूटर की करंट डेट निकाली
-const today = new Date();
-const day = String(today.getDate()).padStart(2, '0');
-const month = String(today.getMonth() + 1).padStart(2, '0');
-const year = today.getFullYear();
+    const newOption = document.createElement("option");
+    newOption.value = formattedDate;
+    newOption.textContent = formattedDate;
 
-// तारीख का फॉर्मेट बनाया (DD/MM/YYYY)
-const formattedDate = `${day}/${month}/${year}`;
+    selectElement.appendChild(newOption);
+    selectElement.value = formattedDate;
+}
 
-// 3. नया ऑप्शन (Option) बनाया
-const newOption = document.createElement("option");
-newOption.value = formattedDate;
-newOption.textContent = formattedDate;
-
-// 4. ड्रॉपडाउन में ऑप्शन जोड़ा
-selectElement.appendChild(newOption);
-
-// 5. इसे ऑटो सिलेक्ट (Auto-Select) कर दिया
-selectElement.value = formattedDate;
-
-=======
->>>>>>> cd1b5212285fdf90353b59eba3321887af7d772f
 // Serial Number & Dates Setup
 let today = new Date();
 let month = today.getMonth() + 1;
@@ -58,7 +47,8 @@ generateStudentId();
 
 // 2. CLEAR FORM FUNCTION
 function clearForm() {
-    document.getElementById("courseName").value ="";
+    document.getElementById("admissionDate").selectedIndex = 0;
+    document.getElementById("courseName").value = "";
     document.getElementById("studentName").value = "";
     document.getElementById("fatherName").value = "";
     document.getElementById("mobile").value = "";
@@ -80,7 +70,7 @@ function clearForm() {
 // 3. SAVE / UPDATE BUTTON EVENT
 saveStudentBtn.addEventListener("click", function () {
 
-    let coursetype= document.getElementById("courseName").value;
+    let coursetype = document.getElementById("courseName").value;
 
     let studentName = document.getElementById("studentName").value.trim();
     if (studentName === "") {
@@ -134,12 +124,13 @@ saveStudentBtn.addEventListener("click", function () {
     function saveToStorage(photoBase64) {
         let studentData = {
             studentId: studentId.value,
-            coursetype: courseName,
+            admissionDate: document.getElementById("admissionDate").value,
+            coursetype: coursetype, // Correction Here
             studentName: studentName,
             fatherName: fatherName,
+            dob: dobFormatted,
             mobile: mobile,
             email: email,
-            dob: dobFormatted,
             houseNo: houseNo,
             areaLocality: areaLocality,
             district: district,
@@ -176,7 +167,7 @@ saveStudentBtn.addEventListener("click", function () {
         };
         reader.readAsDataURL(photoFile);
     } else {
-        let oldPhoto = students[editIndex].photo;
+        let oldPhoto = students[editIndex] ? students[editIndex].photo : "";
         saveToStorage(oldPhoto);
     }
 });
@@ -196,8 +187,7 @@ function showStudentList(filteredStudents = null) {
     studentList.innerHTML = "";
 
     if (savedStudents.length === 0) {
-        studentList.innerHTML = 
-        "<p style='text-align:center;'>No Students Found</p>";
+        studentList.innerHTML = "<p style='text-align:center;'>No Students Found</p>";
         return;
     }
 
@@ -208,64 +198,65 @@ function showStudentList(filteredStudents = null) {
             /* 1. STUDENT INFO CARD */
             "<div class='infoCard studentInfo'>" +
             "<h3>Student Information</h3>" +
-            "<img src='" + student.photo + "' class='studentPhoto'>" +
-            "<p><b>Student ID:</b> " + student.studentId + "</p>" +
-            "<p><b>Course Type:</b>" + student.coursetype +"</p>" +
-
-            "<p><b>Student Name:</b> " + student.studentName + "</p>" +
-            "<p><b>Father Name:</b> " + student.fatherName + "</p>" +
-            "<p><b>Mobile:</b> " + student.mobile + "</p>" +
-            "<p><b>Email:</b> " + student.email + "</p>" +
-            "<p><b>Date of Birth:</b> " + student.dob + "</p>" +
+            "<img src='" + (student.photo || '') + "' class='studentPhoto'>" +
+            "<p><b>Student ID:</b> " + (student.studentId || '') + "</p>" +
+            "<p><b>Course Type:</b> " + (student.coursetype || 'N/A') + "</p>" +
+            "<p><b>Admission Date :</b>" +(student.admissionDate || 'N/A') + "</p>" +
+            "<p><b>Student Name:</b> " + (student.studentName || '') + "</p>" +
+            "<p><b>Father Name:</b> " + (student.fatherName || '') + "</p>" +
+            "<p><b>Mobile:</b> " + (student.mobile || '') + "</p>" +
+            "<p><b>Email:</b> " + (student.email || '') + "</p>" +
+            "<p><b>Date of Birth:</b> " + (student.dob || '') + "</p>" +
             "</div>" +
 
             /* 2. ADDRESS CARD */
             "<div class='infoCard addressInfo'>" +
             "<h3>Student Address</h3>" +
-            "<p><b>House No.:</b> " + student.houseNo + "</p>" +
-            "<p><b>Area & Locality:</b> " + student.areaLocality + "</p>" +
-            "<p><b>District:</b> " + student.district + "</p>" +
-            "<p><b>Pin Code:</b> " + student.pin + "</p>" +
+            "<p><b>House No.:</b> " + (student.houseNo || '') + "</p>" +
+            "<p><b>Area & Locality:</b> " + (student.areaLocality || '') + "</p>" +
+            "<p><b>District:</b> " + (student.district || '') + "</p>" +
+            "<p><b>Pin Code:</b> " + (student.pin || '') + "</p>" +
             "</div>" +
 
             /* 3. QUALIFICATION CARD */
             "<div class='infoCard qualificationInfo'>" +
             "<h3>Student Qualification</h3>" +
-            "<p><b>Qualification:</b> " + student.qualification + "</p>" +
-            "<p><b>Stream:</b> " + student.steam + "</p>" +
-            "<p><b>Board/University:</b> " + student.board + "</p>" +
-            "<p><b>Passing Year:</b> " + student.passingYear + "</p>" +
-            "<p><b>Percentage:</b> " + student.percentage + "%</p>" +
+            "<p><b>Qualification:</b> " + (student.qualification || '') + "</p>" +
+            "<p><b>Stream:</b> " + (student.steam || '') + "</p>" +
+            "<p><b>Board/University:</b> " + (student.board || '') + "</p>" +
+            "<p><b>Passing Year:</b> " + (student.passingYear || '') + "</p>" +
+            "<p><b>Percentage:</b> " + (student.percentage || '') + "%</p>" +
             "</div>" +
 
             /* BUTTON ACTIONS CONTAINER */
-            "<div class ='cardActions'>"+
+            "<div class='cardActions'>" +
             "<button class='editBtn btnStyle' onclick='editStudent(" + index + ")'>Edit</button>" +
-             "<button class='printBtn btnStyle' onclick='printIDCard(" + index + ")'>Print ID</button>" +
-"</div>" +
+            "<button class='printBtn btnStyle' onclick='printIDCard(" + index + ")'>Print ID</button>" +
+            "</div>" +
             "</div>";
     });
-} // <-- यहाँ फ़ंक्शन बंद होना छूट गया था
+}
 
 // 5. EDIT STUDENT FUNCTION
 function editStudent(index) {
     let savedStudents = JSON.parse(localStorage.getItem("students")) || [];
     let student = savedStudents[index];
 
-    document.getElementById("studentId").value = student.studentId;
-    document.getElementById("studentName").value = student.studentName;
-    document.getElementById("fatherName").value = student.fatherName;
-    document.getElementById("mobile").value = student.mobile;
-    document.getElementById("email").value = student.email;
-    document.getElementById("houseNo").value = student.houseNo;
-    document.getElementById("areaLocality").value = student.areaLocality;
-    document.getElementById("district").value = student.district;
-    document.getElementById("pin").value = student.pin;
-    document.getElementById("qualification").value = student.qualification;
-    document.getElementById("steam").value = student.steam;
-    document.getElementById("board").value = student.board;
-    document.getElementById("passingYear").value = student.passingYear;
-    document.getElementById("percentage").value = student.percentage;
+    document.getElementById("studentId").value = student.studentId || "";
+    document.getElementById("courseName").value = student.coursetype || "";
+    document.getElementById("studentName").value = student.studentName || "";
+    document.getElementById("fatherName").value = student.fatherName || "";
+    document.getElementById("mobile").value = student.mobile || "";
+    document.getElementById("email").value = student.email || "";
+    document.getElementById("houseNo").value = student.houseNo || "";
+    document.getElementById("areaLocality").value = student.areaLocality || "";
+    document.getElementById("district").value = student.district || "";
+    document.getElementById("pin").value = student.pin || "";
+    document.getElementById("qualification").value = student.qualification || "";
+    document.getElementById("steam").value = student.steam || "";
+    document.getElementById("board").value = student.board || "";
+    document.getElementById("passingYear").value = student.passingYear || "";
+    document.getElementById("percentage").value = student.percentage || "";
 
     document.getElementById("editIndex").value = index;
     saveStudentBtn.innerText = "Update Student";
@@ -280,8 +271,8 @@ if (searchInput) {
         let allStudents = JSON.parse(localStorage.getItem("students")) || [];
 
         let filtered = allStudents.filter(function (student) {
-            return student.studentName.toLowerCase().includes(query) ||
-                   student.studentId.toLowerCase().includes(query);
+            return (student.studentName && student.studentName.toLowerCase().includes(query)) ||
+                   (student.studentId && student.studentId.toLowerCase().includes(query));
         });
 
         showStudentList(filtered);
@@ -291,12 +282,10 @@ if (searchInput) {
 // Initial Load
 showStudentList();
 
-// PRINT ID CARD FUNCTION (UPDATED DESIGN)
+// PRINT ID CARD FUNCTION
 function printIDCard(index) {
     let savedStudents = JSON.parse(localStorage.getItem("students")) || [];
     let student = savedStudents[index];
-
-    // लोगो का URL (अपनी पसंद की इमेज का लिंक या बेस64 यहाँ डालें)
     let logoUrl = student.instituteLogo || "https://via.placeholder.com/60?text=LOGO"; 
 
     let printWindow = window.open("", "", "width=850,height=650");
@@ -305,154 +294,34 @@ function printIDCard(index) {
         <head>
             <title>ID Card - ${student.studentName}</title>
             <style>
-                * {
-                    box-sizing: border-box;
-                    margin: 0;
-                    padding: 0;
-                }
-                body {
-                    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    min-height: 100vh;
-                    background-color: #f0f2f5;
-                }
-                .idCardContainer {
-                    width: 330px;
-                    height: 500px;
-                    background: #ffffff;
-                    border-radius: 12px;
-                    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-                    border: 1px solid #1f3c56;
-                    overflow: hidden;
-                    position: relative;
-                    display: flex;
-                    flex-direction: column;
-                }
-                /* Header Design */
-                .cardHeader {
-                    background: linear-gradient(135deg, #1f3c56 0%, #112333 100%);
-                    color: #ffffff;
-                    padding: 12px 10px;
-                    text-align: center;
-                    border-bottom: 3px solid #f39c12;
-                }
-                .logoBox {
-                    margin-bottom: 4px;
-                }
-                .logoBox img {
-                    height: 45px;
-                    width: auto;
-                    object-fit: contain;
-                }
-                .instName {
-                    font-size: 15px;
-                    font-weight: 700;
-                    text-transform: uppercase;
-                    letter-spacing: 0.5px;
-                    color: #ffffff;
-                }
-                .instTagline {
-                    font-size: 9px;
-                    color: #f39c12;
-                    letter-spacing: 0.5px;
-                }
-                .cardBadge {
-                    background: #f39c12;
-                    color: #1f3c56;
-                    font-size: 10px;
-                    font-weight: bold;
-                    padding: 2px 10px;
-                    border-radius: 10px;
-                    display: inline-block;
-                    margin-top: 5px;
-                    text-transform: uppercase;
-                }
-                /* Photo Section */
-                .photoArea {
-                    text-align: center;
-                    margin-top: 15px;
-                }
-                .photoArea img {
-                    width: 100px;
-                    height: 100px;
-                    border-radius: 50%;
-                    object-fit: cover;
-                    border: 3px solid #1f3c56;
-                    box-shadow: 0 3px 6px rgba(0,0,0,0.16);
-                }
-                .studentNameHeader {
-                    font-size: 16px;
-                    font-weight: bold;
-                    color: #1f3c56;
-                    margin-top: 8px;
-                    text-transform: uppercase;
-                }
-                /* Student Details Table */
-                .cardBody {
-                    padding: 12px 20px;
-                    flex-grow: 1;
-                }
-                .detailsTable {
-                    width: 100%;
-                    border-collapse: collapse;
-                    font-size: 12px;
-                }
-                .detailsTable td {
-                    padding: 4px 0;
-                    color: #333333;
-                }
-                .detailsTable td.label {
-                    font-weight: bold;
-                    color: #1f3c56;
-                    width: 38%;
-                }
-                /* Footer / Signature */
-                .cardFooter {
-                    background: #f8f9fa;
-                    border-top: 1px solid #e9ecef;
-                    padding: 8px 15px;
-                    display: flex;
-                    justify-content: space-between;
-                    align-items: flex-end;
-                }
-                .footerAddress {
-                    font-size: 8px;
-                    color: #6c757d;
-                    max-width: 60%;
-                    line-height: 1.2;
-                }
-                .signatureBox {
-                    text-align: center;
-                }
-                .signLine {
-                    border-top: 1px dashed #1f3c56;
-                    width: 80px;
-                    margin-top: 15px;
-                }
-                .signText {
-                    font-size: 9px;
-                    color: #1f3c56;
-                    font-weight: bold;
-                    margin-top: 2px;
-                }
-                @media print {
-                    body {
-                        background: none;
-                    }
-                    .idCardContainer {
-                        box-shadow: none;
-                    }
-                }
+                * { box-sizing: border-box; margin: 0; padding: 0; }
+                body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; background-color: #f0f2f5; }
+                .idCardContainer { width: 330px; height: 500px; background: #ffffff; border-radius: 12px; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15); border: 1px solid #1f3c56; overflow: hidden; position: relative; display: flex; flex-direction: column; }
+                .cardHeader { background: linear-gradient(135deg, #1f3c56 0%, #112333 100%); color: #ffffff; padding: 12px 10px; text-align: center; border-bottom: 3px solid #f39c12; }
+                .logoBox { margin-bottom: 4px; }
+                .logoBox img { height: 45px; width: auto; object-fit: contain; }
+                .instName { font-size: 15px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #ffffff; }
+                .instTagline { font-size: 9px; color: #f39c12; letter-spacing: 0.5px; }
+                .cardBadge { background: #f39c12; color: #1f3c56; font-size: 10px; font-weight: bold; padding: 2px 10px; border-radius: 10px; display: inline-block; margin-top: 5px; text-transform: uppercase; }
+                .photoArea { text-align: center; margin-top: 15px; }
+                .photoArea img { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 3px solid #1f3c56; box-shadow: 0 3px 6px rgba(0,0,0,0.16); }
+                .studentNameHeader { font-size: 16px; font-weight: bold; color: #1f3c56; margin-top: 8px; text-transform: uppercase; }
+                .cardBody { padding: 12px 20px; flex-grow: 1; }
+                .detailsTable { width: 100%; border-collapse: collapse; font-size: 12px; }
+                .detailsTable td { padding: 4px 0; color: #333333; }
+                .detailsTable td.label { font-weight: bold; color: #1f3c56; width: 38%; }
+                .cardFooter { background: #f8f9fa; border-top: 1px solid #e9ecef; padding: 8px 15px; display: flex; justify-content: space-between; align-items: flex-end; }
+                .footerAddress { font-size: 8px; color: #6c757d; max-width: 60%; line-height: 1.2; }
+                .signatureBox { text-align: center; }
+                .signLine { border-top: 1px dashed #1f3c56; width: 80px; margin-top: 15px; }
+                .signText { font-size: 9px; color: #1f3c56; font-weight: bold; margin-top: 2px; }
+                @media print { body { background: none; } .idCardContainer { box-shadow: none; } }
             </style>
         </head>
         <body>
             <div class="idCardContainer">
-                <!-- Header Section -->
                 <div class="cardHeader">
                     <div class="logoBox">
-                        <!-- logo image path update -->
                         <img src="${logoUrl}" alt="Logo" onerror="this.style.display='none'">
                     </div>
                     <div class="instName">Dhanvii Accounting Institute</div>
@@ -460,42 +329,42 @@ function printIDCard(index) {
                     <div><span class="cardBadge">Student Identity Card</span></div>
                 </div>
 
-                <!-- Photo Section -->
                 <div class="photoArea">
                     <img src="${student.photo}" alt="Student Photo">
                     <div class="studentNameHeader">${student.studentName}</div>
                 </div>
 
-                <!-- Body Section -->
                 <div class="cardBody">
                     <table class="detailsTable">
                         <tr>
-                            <td class="label"> Studnet ID:</td>
+                            <td class="label">Student ID:</td>
                             <td><b>${student.studentId}</b></td>
                         </tr>
-
                         <tr>
-                        <td class="label"> Course Type:</td>
-                        <td>${student.coursetype}</td>
+                        <td class="label"> Admission Date:</td>
+                        <td>${student.admissionDate || ''}<td>
+                        </tr>
                         
+                        
+                        <tr>
+                            <td class="label">Course Type:</td>
+                            <td>${student.coursetype || ''}</td>
+                        </tr>
                         <tr>
                             <td class="label">Father's Name:</td>
                             <td>${student.fatherName}</td>
                         </tr>
-                        
                         <tr>
                             <td class="label">Contact No:</td>
                             <td>${student.mobile}</td>
                         </tr>
-                        
                     </table>
                 </div>
 
-                <!-- Footer Section -->
                 <div class="cardFooter">
                     <div class="footerAddress">
                         <b>Dhanvii Accounting Institute</b><br>
-                        267,Ganesh Nagar<br>
+                        267, Near Khade Ganesh Ji Mandir Road<br>
                         Kota, Rajasthan<br>
                         Ph: +91 8824248824, 8955989444
                     </div>
@@ -517,4 +386,42 @@ function printIDCard(index) {
     `);
     printWindow.document.close();
 }
+// 1. फॉर्म को सेलेक्ट करें
+let admissionForm = document.getElementById("admissionForm");
 
+// 2. फॉर्म सबमिट होने पर चलने वाला फ़ंक्शन
+admissionForm.addEventListener("submit", function (e) {
+    // पेज रिफ्रेश होने से रोकें
+    e.preventDefault();
+
+    // इनपुट फ़ील्ड्स से वैल्यू निकालें
+    let idValue = document.getElementById("studentId").value.trim().toUpperCase();
+    let nameValue = document.getElementById("studentName").value.trim();
+    let courseValue = document.getElementById("courseType").value;
+
+    if (idValue === "" || nameValue === "") {
+        alert("कृपया सभी जानकारी भरें!");
+        return;
+    }
+
+    // नया स्टूडेंट ऑब्जेक्ट बनाएं
+    let newStudent = {
+        studentId: idValue,
+        studentName: nameValue,
+        coursetype: courseValue
+    };
+
+    // पुरानी लिस्ट निकालें या खाली Array लें
+    let students = JSON.parse(localStorage.getItem("students")) || [];
+
+    // नया स्टूडेंट जोड़ें
+    students.push(newStudent);
+
+    // localStorage में सेव करें
+    localStorage.setItem("students", JSON.stringify(students));
+
+    alert("स्टूडेंट " + idValue + " सफलतापूर्वक सेव हो गया!");
+    
+    // फॉर्म खाली करें
+    admissionForm.reset();
+});
