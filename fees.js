@@ -1,16 +1,18 @@
 /* ==========================================
-   1. Course Fee Configuration
+   Dhanvii Fee & Student Management System
+   Complete & Safe Main Script (fees.js)
    ========================================== */
+
+// 1. Global Variables & DOM Elements Selection
+let currentStudentData = null;
+
 const courseFees = {
     "TALLY PRIME": 10000,
-    "BIGINNER ACCOUNTING COURSE": 15000,
-    "PROFESSONAL ACCOUNTING COURSE": 18000,
+    "BEGINNER ACCOUNTING COURSE": 15000,
+    "PROFESSIONAL ACCOUNTING COURSE": 18000,
     "MASTER ACCOUNTING, FINANCE & AUDIT PROGRAM": 25000
 };
 
-/* ==========================================
-   2. DOM Elements Selection
-   ========================================== */
 let feeStudentIdInput = document.getElementById("feeStudentId");
 let searchFeeBtn = document.getElementById("searchFeeBtn");
 let studentFeeSummary = document.getElementById("studentFeeSummary");
@@ -30,74 +32,91 @@ let displayDue = document.getElementById("displayDue");
 let paymentHistorySection = document.getElementById("paymentHistorySection");
 let historyTableBody = document.getElementById("historyTableBody");
 
-let currentStudentIndex = -1;
-
 /* ==========================================
-   3. Search Student Event
+   2. Search Student Event (Async API Fetch)
    ========================================== */
 if (searchFeeBtn) {
-    searchFeeBtn.addEventListener("click", function () {
+    searchFeeBtn.onclick = async function (e) {
+        if (e) e.preventDefault();
+
+        if (!feeStudentIdInput) feeStudentIdInput = document.getElementById("feeStudentId");
         let enteredId = feeStudentIdInput ? feeStudentIdInput.value.trim().toUpperCase() : "";
 
-        if (enteredId === "") {
-            alert("कृपया Student ID दर्ज करें!");
+        if (!enteredId) {
+            alert("कृपया Student ID / Roll No दर्ज करें!");
             return;
         }
 
-        let rawData = localStorage.getItem("students");
-        let students = JSON.parse(rawData) || [];
+        try {
+            let encodedId = encodeURIComponent(enteredId);
+let response = await fetch(`http://localhost:5000/api/students/${encodedId}`);
+                alert(`सर्वर एरर (Status: ${response.status}) - ID की जांच करें।`);
+                return;
+            }
 
-        currentStudentIndex = students.findIndex(function (s) {
-            let allValues = Object.values(s).map(v => (v || "").toString().trim().toUpperCase());
-            return allValues.includes(enteredId);
-        });
+            let result = await response.json();
+            if (!result.success || !result.data) {
+                alert("इस ID वाला कोई स्टूडेंट नहीं मिला!");
+                hideSummarySections();
+                return;
+            }
 
-        if (currentStudentIndex === -1) {
-            alert("इस ID वाला कोई स्टूडेंट नहीं मिला!");
-            if (studentFeeSummary) studentFeeSummary.style.display = "none";
-            if (feeStatusCard) feeStatusCard.style.display = "none";
-            if (paymentHistorySection) paymentHistorySection.style.display = "none";
-            return;
+            currentStudentData = result.data;
+            populateStudentFeeDetails(currentStudentData);
+
+        } catch (error) {
+            console.error("API Search Error:", error);
+            alert("सर्वर से कनेक्ट नहीं हो सका! सुनिश्चित करें कि terminal में 'node server.js' चालू है।");
         }
+    };
+}
 
-        let student = students[currentStudentIndex];
-        let sName = student.studentName || student.name || "N/A";
-        let sCourse = (student.coursetype || student.courseType || "").toUpperCase();
-
-        let autoTotalFee = (student.feeDetails && student.feeDetails.totalFee)
-                           ? Number(student.feeDetails.totalFee)
-                           : (courseFees[sCourse] || 15000);
-
-        let savedDiscount = (student.feeDetails && student.feeDetails.discount) ? Number(student.feeDetails.discount) : 0;
-        let savedReason = (student.feeDetails && student.feeDetails.discountReason) ? student.feeDetails.discountReason : "None";
-        let paidVal = (student.feeDetails && student.feeDetails.paidFee) ? Number(student.feeDetails.paidFee) : 0;
-        
-        let netPayable = autoTotalFee - savedDiscount;
-        let remainingDue = netPayable - paidVal;
-
-        if (summaryName) summaryName.value = sName;
-        if (summaryCourse) summaryCourse.value = sCourse || "N/A";
-        if (summaryTotalFee) summaryTotalFee.value = autoTotalFee;
-        if (summaryDiscount) summaryDiscount.value = savedDiscount;
-        if (discountReason) discountReason.value = savedReason;
-        if (summaryFinalFee) summaryFinalFee.value = netPayable;
-
-        if (displayPaid) displayPaid.innerText = paidVal;
-        if (displayDue) displayDue.innerText = remainingDue;
-
-        if (studentFeeSummary) studentFeeSummary.style.display = "block";
-        if (feeStatusCard) feeStatusCard.style.display = "block";
-
-        let txList = (student.feeDetails && student.feeDetails.transactions) ? student.feeDetails.transactions : [];
-        renderHistoryTable(txList);
-
-        let existingSlots = (student.feeDetails && student.feeDetails.manualSlots) ? student.feeDetails.manualSlots : null;
-        renderManualSlots(existingSlots);
-    });
+function hideSummarySections() {
+    if (studentFeeSummary) studentFeeSummary.style.display = "none";
+    if (feeStatusCard) feeStatusCard.style.display = "none";
+    if (paymentHistorySection) paymentHistorySection.style.display = "none";
 }
 
 /* ==========================================
-   4. Discount Calculation Event
+   3. Populate Student & Fee Data
+   ========================================== */
+function populateStudentFeeDetails(student) {
+    let sName = student.name || student.studentName || "N/A";
+    let sCourse = (student.course || student.courseType || "").toUpperCase();
+
+    let autoTotalFee = (student.feeDetails && student.feeDetails.totalFee)
+        ? Number(student.feeDetails.totalFee)
+        : (courseFees[sCourse] || student.totalFee || 15000);
+
+    let savedDiscount = (student.feeDetails && student.feeDetails.discount) ? Number(student.feeDetails.discount) : 0;
+    let savedReason = (student.feeDetails && student.feeDetails.discountReason) ? student.feeDetails.discountReason : "";
+    let paidVal = (student.feeDetails && student.feeDetails.paidFee) ? Number(student.feeDetails.paidFee) : (student.paidFee || 0);
+
+    let netPayable = autoTotalFee - savedDiscount;
+    let remainingDue = netPayable - paidVal;
+
+    if (summaryName) summaryName.value = sName;
+    if (summaryCourse) summaryCourse.value = sCourse || "N/A";
+    if (summaryTotalFee) summaryTotalFee.value = autoTotalFee;
+    if (summaryDiscount) summaryDiscount.value = savedDiscount;
+    if (discountReason) discountReason.value = savedReason;
+    if (summaryFinalFee) summaryFinalFee.value = netPayable;
+
+    if (displayPaid) displayPaid.innerText = paidVal;
+    if (displayDue) displayDue.innerText = remainingDue >= 0 ? remainingDue : 0;
+
+    if (studentFeeSummary) studentFeeSummary.style.display = "block";
+    if (feeStatusCard) feeStatusCard.style.display = "block";
+
+    let txList = (student.feeDetails && student.feeDetails.transactions) ? student.feeDetails.transactions : [];
+    renderHistoryTable(txList);
+
+    let existingSlots = (student.feeDetails && student.feeDetails.manualSlots) ? student.feeDetails.manualSlots : null;
+    renderManualSlots(existingSlots);
+}
+
+/* ==========================================
+   4. Discount Live Calculation Event
    ========================================== */
 if (summaryDiscount) {
     summaryDiscount.addEventListener("input", function () {
@@ -114,26 +133,30 @@ if (summaryDiscount) {
         let netFeePayable = total - discount;
         summaryFinalFee.value = netFeePayable;
 
-        let currentPaid = Number(displayPaid.innerText) || 0;
+        let currentPaid = displayPaid ? (Number(displayPaid.innerText) || 0) : 0;
         let remainingDue = netFeePayable - currentPaid;
-        displayDue.innerText = remainingDue >= 0 ? remainingDue : 0;
+        if (displayDue) displayDue.innerText = remainingDue >= 0 ? remainingDue : 0;
 
         calculateTotalPlanned();
     });
 }
 
 /* ==========================================
-   5. Submit Payment Event (Incremental Slot Filling)
+   5. Submit Payment Event (API Update)
    ========================================== */
 if (payFeeBtn) {
-    payFeeBtn.addEventListener("click", function () {
-        if (currentStudentIndex === -1) {
+    payFeeBtn.onclick = async function (e) {
+        if (e) e.preventDefault();
+
+        if (!currentStudentData) {
             alert("पहले स्टूडेंट सर्च करें!");
             return;
         }
 
-        let payingAmount = Number(document.getElementById("payingAmount").value);
-        let paymentMode = document.getElementById("paymentMode") ? document.getElementById("paymentMode").value : "Cash";
+        let payingAmountInput = document.getElementById("payingAmount");
+        let payingAmount = payingAmountInput ? Number(payingAmountInput.value) : 0;
+        let paymentModeElem = document.getElementById("paymentMode");
+        let paymentMode = paymentModeElem ? paymentModeElem.value : "Cash";
         let netFeePayable = Number(summaryFinalFee.value);
 
         if (!payingAmount || payingAmount <= 0) {
@@ -141,11 +164,7 @@ if (payFeeBtn) {
             return;
         }
 
-        let rawData = localStorage.getItem("students");
-        let students = JSON.parse(rawData) || [];
-        let student = students[currentStudentIndex];
-
-        let previousPaid = (student.feeDetails && student.feeDetails.paidFee) ? Number(student.feeDetails.paidFee) : 0;
+        let previousPaid = (currentStudentData.feeDetails && currentStudentData.feeDetails.paidFee) ? Number(currentStudentData.feeDetails.paidFee) : 0;
         let newPaidTotal = previousPaid + payingAmount;
 
         if (newPaidTotal > netFeePayable) {
@@ -154,15 +173,19 @@ if (payFeeBtn) {
         }
 
         let remainingDue = netFeePayable - newPaidTotal;
+        let previousTx = (currentStudentData.feeDetails && currentStudentData.feeDetails.transactions) ? currentStudentData.feeDetails.transactions : [];
 
-        let previousTx = (student.feeDetails && student.feeDetails.transactions) ? student.feeDetails.transactions : [];
+        let nextReceiptNo = "R-" + (100 + previousTx.length + 1);
+        let currentDate = new Date().toLocaleDateString('en-IN') + " " + new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+
         previousTx.push({
-            date: new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            receiptNo: nextReceiptNo,
+            date: currentDate,
             amount: payingAmount,
             mode: paymentMode
         });
 
-        // Current Slots Allocation
+        // Allocation to slots
         let currentSlots = getManualSlotsData();
         let amountToAllocate = payingAmount;
 
@@ -189,7 +212,7 @@ if (payFeeBtn) {
             }
         }
 
-        student.feeDetails = {
+        let updatedFeeDetails = {
             totalFee: Number(summaryTotalFee.value),
             discount: Number(summaryDiscount.value),
             discountReason: discountReason ? discountReason.value : "",
@@ -200,92 +223,147 @@ if (payFeeBtn) {
             transactions: previousTx
         };
 
-        students[currentStudentIndex] = student;
-        localStorage.setItem("students", JSON.stringify(students));
+        try {
+            let response = await fetch(`http://localhost:5000/api/students/${currentStudentData.rollNo || currentStudentData.id}/pay`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    feeDetails: updatedFeeDetails,
+                    paidFee: newPaidTotal,
+                    dueFee: remainingDue
+                })
+            });
 
-        if (displayPaid) displayPaid.innerText = newPaidTotal;
-        if (displayDue) displayDue.innerText = remainingDue;
-        
-        renderHistoryTable(previousTx);
-        renderManualSlots(currentSlots);
+            let resData = await response.json();
 
-        alert(`₹${payingAmount} की फीस सफलतापूर्वक जमा हो गई है!`);
-        document.getElementById("payingAmount").value = "";
-    });
+            if (resData.success) {
+                currentStudentData.feeDetails = updatedFeeDetails;
+                if (displayPaid) displayPaid.innerText = newPaidTotal;
+                if (displayDue) displayDue.innerText = remainingDue;
+
+                renderHistoryTable(previousTx);
+                renderManualSlots(currentSlots);
+
+                alert(`रसीद नं. ${nextReceiptNo} - ₹${payingAmount} की फीस सफलतापूर्वक जमा हो गई है!`);
+                if (payingAmountInput) payingAmountInput.value = "";
+                showStudentReport(); // Refresh bottom table
+            } else {
+                alert("पेमेंट सेव करने में त्रुटि: " + resData.message);
+            }
+        } catch (error) {
+            console.error("Payment API Error:", error);
+            alert("सर्वर से संपर्क करने में समस्या हुई।");
+        }
+    };
 }
 
 /* ==========================================
    6. Print Receipt Event
    ========================================== */
 if (printReceiptBtn) {
-    printReceiptBtn.addEventListener("click", function () {
+    printReceiptBtn.onclick = function (e) {
+        if (e) e.preventDefault();
+
+        if (!currentStudentData) {
+            alert("पहले स्टूडेंट सर्च करें!");
+            return;
+        }
+
+        let txList = (currentStudentData.feeDetails && currentStudentData.feeDetails.transactions) ? currentStudentData.feeDetails.transactions : [];
+
+        if (txList.length === 0) {
+            alert("इस स्टूडेंट का कोई पेमेंट रिकॉर्ड नहीं मिला!");
+            return;
+        }
+
+        let lastTx = txList[txList.length - 1];
         let studentName = summaryName ? summaryName.value : "N/A";
         let studentCourse = summaryCourse ? summaryCourse.value : "N/A";
         let enteredId = feeStudentIdInput ? feeStudentIdInput.value : "N/A";
-        let paidVal = displayPaid ? displayPaid.innerText : "0";
+        let totalPaidVal = displayPaid ? displayPaid.innerText : "0";
         let dueVal = displayDue ? displayDue.innerText : "0";
 
         let receiptWindow = window.open("", "_blank");
         receiptWindow.document.write(`
             <html>
             <head>
-                <title>Fee Receipt - ${studentName}</title>
+                <title>Fee Receipt - ${lastTx.receiptNo}</title>
                 <style>
                     body { font-family: Arial, sans-serif; padding: 20px; }
-                    .receipt-box { border: 2px solid #000; padding: 20px; max-width: 400px; margin: auto; }
-                    h2 { text-align: center; margin-bottom: 5px; }
-                    p { margin: 5px 0; }
-                    hr { border: 1px dashed #000; }
+                    .receipt-box { border: 2px solid #000; padding: 20px; max-width: 420px; margin: auto; }
+                    h2 { text-align: center; margin-bottom: 2px; color: #1a4d2e; }
+                    .sub-head { text-align: center; margin-top: 0; font-size: 14px; color: #555; }
+                    p { margin: 6px 0; font-size: 14px; }
+                    hr { border: 1px dashed #000; margin: 10px 0; }
+                    .flex-justify { display: flex; justify-content: space-between; }
                 </style>
             </head>
             <body>
                 <div class="receipt-box">
                     <h2>Dhanvii Accounting Institute</h2>
-                    <p style="text-align:center;">Fee Payment Receipt</p>
+                    <p class="sub-head">Fee Payment Receipt</p>
                     <hr>
+                    <div class="flex-justify">
+                        <span><b>Receipt No:</b> ${lastTx.receiptNo}</span>
+                        <span><b>Date:</b> ${lastTx.date}</span>
+                    </div>
                     <p><b>Student ID:</b> ${enteredId}</p>
                     <p><b>Student Name:</b> ${studentName}</p>
                     <p><b>Course:</b> ${studentCourse}</p>
                     <hr>
-                    <p><b>Total Paid Amount:</b> ₹${paidVal}</p>
+                    <p><b>Deposited Amount:</b> <span style="font-size: 16px;"><b>₹${lastTx.amount}</b></span> (${lastTx.mode})</p>
+                    <p><b>Total Paid Till Date:</b> ₹${totalPaidVal}</p>
                     <p><b>Remaining Balance:</b> ₹${dueVal}</p>
-                    <p><b>Date:</b> ${new Date().toLocaleDateString()}</p>
                     <hr>
-                    <p style="text-align:center;"><i>Thank You!</i></p>
+                    <p style="text-align:center;"><i>Thank You for Payment!</i></p>
                 </div>
                 <script>window.print();<\/script>
             </body>
             </html>
         `);
         receiptWindow.document.close();
-    });
+    };
 }
 
 /* ==========================================
-   7. Render Transaction Table
+   7. Render Transaction History Table
    ========================================== */
 function renderHistoryTable(transactions) {
     if (!historyTableBody) return;
+    
     historyTableBody.innerHTML = "";
 
+    if (paymentHistorySection) {
+        paymentHistorySection.style.display = "block";
+    }
+
     if (!transactions || transactions.length === 0) {
-        if (paymentHistorySection) paymentHistorySection.style.display = "none";
+        historyTableBody.innerHTML = `
+            <tr>
+                <td colspan="4" style="text-align: center; color: #777;">
+                    कोई पेमेंट हिस्ट्री उपलब्ध नहीं है।
+                </td>
+            </tr>
+        `;
         return;
     }
 
     transactions.forEach(function (tx, index) {
+        let rNo = tx.receiptNo || ("R-" + (101 + index));
+        let txDate = tx.date || "N/A";
+        let txAmount = tx.amount || 0;
+        let txMode = tx.mode || "Cash";
+
         let row = `
             <tr>
-                <td>${index + 1}</td>
-                <td>${tx.date}</td>
-                <td>₹${tx.amount}</td>
-                <td>${tx.mode}</td>
+                <td><b>${rNo}</b></td>
+                <td>${txDate}</td>
+                <td style="color: green; font-weight: bold;">₹${txAmount}</td>
+                <td><span class="badge" style="background:#e8f5e9; padding:3px 8px; border-radius:4px; font-weight:bold; color:#2e7d32;">${txMode}</span></td>
             </tr>
         `;
         historyTableBody.innerHTML += row;
     });
-
-    if (paymentHistorySection) paymentHistorySection.style.display = "block";
 }
 
 /* ==========================================
@@ -339,11 +417,11 @@ function renderManualSlots(existingSlots = null) {
 }
 
 /* ==========================================
-   9. Calculate Total Planned & Balance Check
+   9. Calculate Total Planned & Balance
    ========================================== */
 function calculateTotalPlanned() {
     let netFeePayable = Number(document.getElementById("summaryFinalFee")?.value) || 0;
-    
+
     let totalSlotPlanned = 0;
     for (let i = 1; i <= 6; i++) {
         let amtInput = document.getElementById(`slotAmt_${i}`);
@@ -361,7 +439,7 @@ function calculateTotalPlanned() {
 
     if (remainingSpan) {
         let balanceToPlan = netFeePayable - totalSlotPlanned;
-        
+
         if (balanceToPlan === 0) {
             remainingSpan.style.color = "green";
             remainingSpan.innerText = "0 (Fully Planned)";
@@ -376,7 +454,7 @@ function calculateTotalPlanned() {
 }
 
 /* ==========================================
-   10. Collect Manual Slots Data
+   10. Collect Slots Data
    ========================================== */
 function getManualSlotsData() {
     let slots = [];
@@ -400,3 +478,42 @@ function getManualSlotsData() {
     }
     return slots;
 }
+
+/* ==========================================
+   11. Show Bottom Student Report Table
+   ========================================== */
+function showStudentReport() {
+    let tbody = document.getElementById("studentTableBody");
+    if (!tbody) return;
+
+    fetch('http://localhost:5000/api/students')
+        .then(res => res.json())
+        .then(result => {
+            if (result.success && result.data && result.data.length > 0) {
+                tbody.innerHTML = "";
+
+                result.data.forEach(student => {
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>${student.rollNo || '-'}</td>
+                            <td><b>${student.name}</b></td>
+                            <td>${student.course || '-'}</td>
+                            <td>₹${student.totalFee || 0}</td>
+                            <td style="color:green; font-weight:bold;">₹${student.paidFee || 0}</td>
+                            <td style="color:red; font-weight:bold;">₹${student.dueFee || 0}</td>
+                        </tr>
+                    `;
+                });
+            } else {
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;">डेटाबेस में अभी कोई डेटा नहीं है। कृपया पहले फ़ॉर्म भरकर स्टूडेंट सेव करें।</td></tr>`;
+            }
+        })
+        .catch(err => {
+            console.error("Report Fetch Error:", err);
+            if (tbody) {
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:red;">सर्वर चालू नहीं है (Terminal में 'node server.js' चलाएँ)</td></tr>`;
+            }
+        });
+}
+
+window.addEventListener("load", showStudentReport);

@@ -262,131 +262,170 @@ paymentMode.addEventListener("change", function() {
 });
  
 // Save Student Button
+let saveStudentBtn = document.getElementById("saveStudentBtn");
 
-let saveStudentBtn =
-    document.getElementById("saveStudentBtn");
+saveStudentBtn.addEventListener("click", async function() {
 
-
-saveStudentBtn.addEventListener("click", function() {
-
-
+loadStudentReport()
     // Student Basic Information
+    let studentId = document.getElementById("studentId").value;
+    let studentName = document.getElementById("studentName").value;
+    let fatherName = document.getElementById("fatherName").value;
+    let mobile = document.getElementById("mobile").value;
+    let email = document.getElementById("email").value;
+    let dob = document.getElementById("dob").value;
 
-    let studentId =
-        document.getElementById("studentId").value;
+    // Course & Fee Information
+    let courseName = course.options[course.selectedIndex]?.text || "";
+    let totalFees = Number(document.getElementById("totalFees").value) || 0;
+    let receivedFees = Number(document.getElementById("receivedFees").value) || 0;
+    let balanceFees = Number(document.getElementById("balanceFees").value) || 0;
 
-    let studentName =
-        document.getElementById("studentName").value;
-
-    let fatherName =
-        document.getElementById("fatherName").value;
-
-    let mobile =
-        document.getElementById("mobile").value;
-
-    let email =
-        document.getElementById("email").value;
-
-    let dob =
-        document.getElementById("dob").value;
-
-
-    // Address
-
-    let houseNo =
-        document.getElementById("houseNo").value;
-
-    let areaLocality =
-        document.getElementById("areaLocality").value;
-
-    let district =
-        document.getElementById("district").value;
-
-    let pin =
-        document.getElementById("pin").value;
-
-
-    // Student Name check
-
+    // Validation
     if (studentName === "") {
-
         alert("Please Enter Student Name");
-
         return;
     }
-
-
-    // Mobile check
 
     if (mobile === "") {
-
         alert("Please Enter Mobile Number");
-
         return;
     }
 
-
-    // Student Data Object
-
+    // Backend Schema के अनुसार Object बनाएँ
     let studentData = {
-
-        studentId: studentId,
-
-        studentName: studentName,
-
-        fatherName: fatherName,
-
-        mobile: mobile,
-
-        email: email,
-
-        dob: dob,
-
-        address: {
-
-            houseNo: houseNo,
-
-            areaLocality: areaLocality,
-
-            district: district,
-
-            pin: pin
-
-        }
-
+        name: studentName,
+        rollNo: studentId, // studentId को rollNo की तरह भेज रहे हैं
+        course: courseName,
+        admissionMonth: new Date().toLocaleString('default', { month: 'long' }), // चालू महीना
+        totalFee: totalFees,
+        paidFee: receivedFees,
+        dueFee: balanceFees
     };
 
+    try {
+        // API के जरिए MongoDB Atlas को डाटा भेजें
+        let response = await fetch('http://localhost:5000/api/students', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(studentData)
+        });
 
-    // Console mein check
+        let result = await response.json();
 
-    console.log(studentData);
+        if (result.success) {
+            alert("✅ Student Data MongoDB Atlas में सफलतापूर्वक सेव हो गया!");
 
+            // Screen पर भी Show करें
+            document.getElementById("studentDetails").innerHTML =
+                "Student ID: " + studentId + "<br>" +
+                "Student Name: " + studentName + "<br>" +
+                "Mobile: " + mobile + "<br>" +
+                "Course: " + courseName + "<br>" +
+                "Paid Fee: ₹" + receivedFees + "<br>" +
+                "Due Fee: ₹" + balanceFees;
+        } else {
+            alert("❌ Server Error: " + result.message);
+        }
 
-    // Browser mein Student Details show
-
-    document.getElementById("studentDetails").innerHTML =
-
-        "Student ID: " + studentId + "<br>" +
-
-        "Student Name: " + studentName + "<br>" +
-
-        "Father Name: " + fatherName + "<br>" +
-
-        "Mobile: " + mobile + "<br>" +
-
-        "Email: " + email + "<br>" +
-
-        "Date of Birth: " + dob + "<br>" +
-
-        "House No: " + houseNo + "<br>" +
-
-        "Area & Locality: " + areaLocality + "<br>" +
-
-        "District: " + district + "<br>" +
-
-        "Pin Code: " + pin;
-
-
-    alert("Student Data Saved Successfully");
-
+    } catch (error) {
+        console.error("Error:", error);
+        alert("❌ Server से कनेक्ट नहीं हो सका! (कृपया चेक करें कि node server.js चालू है)");
+    }
 });
+// Fee Update Button (fee.html के लिए)
+let updateFeeBtn = document.getElementById("updateFeeBtn") || calculateBtn;
+
+if (updateFeeBtn) {
+    loadStudentReport();
+    
+    updateFeeBtn.addEventListener("click", async function () {
+        
+        // फ़ीस की जानकारी लें
+        let studentName = document.getElementById("studentName") ? document.getElementById("studentName").value : "";
+        let totalFees = Number(document.getElementById("totalFees").value) || 0;
+        let receivedFees = Number(document.getElementById("receivedFees").value) || 0;
+        let balanceFees = Number(document.getElementById("balanceFees").value) || 0;
+        let selectedCourse = course ? course.options[course.selectedIndex]?.text : "";
+
+        if (!studentName) {
+            alert("कृपया छात्र का नाम भरें!");
+            return;
+        }
+
+        // अपडेट करने के लिए डेटा पैकेज
+        let feeData = {
+            name: studentName,
+            course: selectedCourse,
+            totalFee: totalFees,
+            paidFee: receivedFees,
+            dueFee: balanceFees
+        };
+
+        try {
+            // बैकएंड को डेटा भेजें (POST/PUT)
+            let response = await fetch('http://localhost:5000/api/students', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(feeData)
+            });
+
+            let result = await response.json();
+
+            if (result.success) {
+                alert("✅ " + studentName + " की फ़ीस सफलतापूर्वक अपडेट हो गई!");
+            } else {
+                alert("❌ एरर: " + result.message);
+            }
+        } catch (error) {
+            console.error("Error updating fee:", error);
+            alert("❌ सर्वर से कनेक्ट नहीं हो सका!");
+        }
+    });
+}
+// MongoDB Atlas से सभी Students का डेटा लाकर टेबल में दिखाने वाला फ़ंक्शन
+async function loadStudentReport() {
+    let tableBody = document.getElementById("studentTableBody");
+    if (!tableBody) return; // अगर पेज पर टेबल नहीं है तो कोड रुक जाएगा
+
+    try {
+        let response = await fetch('http://localhost:5000/api/students');
+        let result = await response.json();
+
+        if (result.success) {
+            let students = result.data;
+            tableBody.innerHTML = ""; // पुरानी टेबल खाली करें
+
+            if (students.length === 0) {
+                tableBody.innerHTML = `<tr><td colspan="7" style="text-align:center;">कोई डेटा उपलब्ध नहीं है</td></tr>`;
+                return;
+            }
+
+            // प्रत्येक छात्र के लिए Row बनाएँ
+            students.forEach(student => {
+                let statusColor = student.dueFee > 0 ? "red" : "green";
+                let statusText = student.dueFee > 0 ? "Due" : "Paid";
+
+                let row = `
+                    <tr>
+                        <td>${student.rollNo || '-'}</td>
+                        <td><b>${student.name}</b></td>
+                        <td>${student.course || '-'}</td>
+                        <td>₹${student.totalFee || 0}</td>
+                        <td style="color: green;">₹${student.paidFee || 0}</td>
+                        <td style="color: red;">₹${student.dueFee || 0}</td>
+                        <td style="color: ${statusColor}; font-weight: bold;">${statusText}</td>
+                    </tr>
+                `;
+                tableBody.innerHTML += row;
+            });
+        }
+    } catch (error) {
+        console.error("डेटा लोड करने में त्रुटि:", error);
+    }
+}
+
+// पेज लोड होते ही और फ़ॉर्म सेव होते ही रिपोर्ट अपने-आप अपडेट हो जाए
+window.addEventListener("DOMContentLoaded", loadStudentReport);

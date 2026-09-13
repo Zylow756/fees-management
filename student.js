@@ -47,136 +47,139 @@ generateStudentId();
 
 // 2. CLEAR FORM FUNCTION
 function clearForm() {
-    document.getElementById("admissionDate").selectedIndex = 0;
-    document.getElementById("courseName").value = "";
-    document.getElementById("studentName").value = "";
-    document.getElementById("fatherName").value = "";
-    document.getElementById("mobile").value = "";
-    document.getElementById("email").value = "";
-    document.getElementById("dob").value = "";
-    document.getElementById("houseNo").value = "";
-    document.getElementById("areaLocality").value = "";
-    document.getElementById("district").value = "";
-    document.getElementById("pin").value = "";
-    document.getElementById("studentPhoto").value = "";
-    document.getElementById("qualification").value = "";
-    document.getElementById("steam").value = "";
-    document.getElementById("board").value = "";
-    document.getElementById("passingYear").value = "";
-    document.getElementById("percentage").value = "";
-    document.getElementById("editIndex").value = "-1";
+    if (document.getElementById("admissionDate")) document.getElementById("admissionDate").selectedIndex = 0;
+    if (document.getElementById("courseName")) document.getElementById("courseName").value = "";
+    if (document.getElementById("studentName")) document.getElementById("studentName").value = "";
+    if (document.getElementById("fatherName")) document.getElementById("fatherName").value = "";
+    if (document.getElementById("mobile")) document.getElementById("mobile").value = "";
+    if (document.getElementById("email")) document.getElementById("email").value = "";
+    if (document.getElementById("dob")) document.getElementById("dob").value = "";
+    if (document.getElementById("houseNo")) document.getElementById("houseNo").value = "";
+    if (document.getElementById("areaLocality")) document.getElementById("areaLocality").value = "";
+    if (document.getElementById("district")) document.getElementById("district").value = "";
+    if (document.getElementById("pin")) document.getElementById("pin").value = "";
+    if (document.getElementById("studentPhoto")) document.getElementById("studentPhoto").value = "";
+    if (document.getElementById("qualification")) document.getElementById("qualification").value = "";
+    if (document.getElementById("steam")) document.getElementById("steam").value = "";
+    if (document.getElementById("board")) document.getElementById("board").value = "";
+    if (document.getElementById("passingYear")) document.getElementById("passingYear").value = "";
+    if (document.getElementById("percentage")) document.getElementById("percentage").value = "";
+    if (document.getElementById("editIndex")) document.getElementById("editIndex").value = "-1";
 }
 
 // 3. SAVE / UPDATE BUTTON EVENT
-saveStudentBtn.addEventListener("click", function () {
+if (saveStudentBtn) {
+    saveStudentBtn.addEventListener("click", function () {
+        let coursetype = document.getElementById("courseName") ? document.getElementById("courseName").value : "";
 
-    let coursetype = document.getElementById("courseName").value;
-
-    let studentName = document.getElementById("studentName").value.trim();
-    if (studentName === "") {
-        alert("Please Enter Student Name");
-        return;
-    }
-
-    let fatherName = document.getElementById("fatherName").value.trim();
-    let mobile = document.getElementById("mobile").value.trim();
-
-    if (!/^\d{10}$/.test(mobile)) {
-        alert("Mobile Number must be 10 digits");
-        return;
-    }
-
-    let email = document.getElementById("email").value.trim();
-    let dob = document.getElementById("dob").value;
-    let dobFormatted = "";
-    if (dob !== "") {
-        let dobParts = dob.split("-");
-        dobFormatted = dobParts[2] + "/" + dobParts[1] + "/" + dobParts[0];
-    }
-
-    let houseNo = document.getElementById("houseNo").value.trim();
-    let areaLocality = document.getElementById("areaLocality").value.trim();
-    let district = document.getElementById("district").value.trim();
-    let pin = document.getElementById("pin").value.trim();
-
-    if (!/^\d{6}$/.test(pin)) {
-        alert("Pin Code must be 6 digits");
-        return;
-    }
-
-    let qualification = document.getElementById("qualification").value;
-    let steam = document.getElementById("steam").value;
-    let board = document.getElementById("board").value.trim();
-    let passingYear = document.getElementById("passingYear").value.trim();
-    let percentage = document.getElementById("percentage").value.trim();
-
-    let editIndex = document.getElementById("editIndex").value;
-    let photoInput = document.getElementById("studentPhoto");
-    let photoFile = photoInput.files[0];
-
-    if (editIndex == "-1" && !photoFile) {
-        alert("Please Select Student Photo");
-        return;
-    }
-
-    let students = JSON.parse(localStorage.getItem("students")) || [];
-
-    function saveToStorage(photoBase64) {
-        let studentData = {
-            studentId: studentId.value,
-            admissionDate: document.getElementById("admissionDate").value,
-            coursetype: coursetype, // Correction Here
-            studentName: studentName,
-            fatherName: fatherName,
-            dob: dobFormatted,
-            mobile: mobile,
-            email: email,
-            houseNo: houseNo,
-            areaLocality: areaLocality,
-            district: district,
-            pin: pin,
-            photo: photoBase64,
-            qualification: qualification,
-            steam: steam,
-            board: board,
-            passingYear: passingYear,
-            percentage: percentage
-        };
-
-        if (editIndex == "-1") {
-            students.push(studentData);
-            serialNumber = Number(serialNumber) + 1;
-            localStorage.setItem("studentSerial", serialNumber);
-        } else {
-            students[editIndex] = studentData;
-            saveStudentBtn.innerText = "Save Student";
+        let studentName = document.getElementById("studentName") ? document.getElementById("studentName").value.trim() : "";
+        if (studentName === "") {
+            alert("Please Enter Student Name");
+            return;
         }
 
-        localStorage.setItem("students", JSON.stringify(students));
-        alert("Data Saved/Updated Successfully!");
+        let fatherName = document.getElementById("fatherName") ? document.getElementById("fatherName").value.trim() : "";
+        let mobile = document.getElementById("mobile") ? document.getElementById("mobile").value.trim() : "";
 
-        clearForm();
-        generateStudentId();
-        showStudentList();
-    }
+        if (!/^\d{10}$/.test(mobile)) {
+            alert("Mobile Number must be 10 digits");
+            return;
+        }
 
-    if (photoFile) {
-        let reader = new FileReader();
-        reader.onload = function () {
-            saveToStorage(reader.result);
-        };
-        reader.readAsDataURL(photoFile);
-    } else {
-        let oldPhoto = students[editIndex] ? students[editIndex].photo : "";
-        saveToStorage(oldPhoto);
-    }
-});
+        let email = document.getElementById("email") ? document.getElementById("email").value.trim() : "";
+        let dob = document.getElementById("dob") ? document.getElementById("dob").value : "";
+        let dobFormatted = "";
+        if (dob !== "") {
+            let dobParts = dob.split("-");
+            dobFormatted = dobParts[2] + "/" + dobParts[1] + "/" + dobParts[0];
+        }
+
+        let houseNo = document.getElementById("houseNo") ? document.getElementById("houseNo").value.trim() : "";
+        let areaLocality = document.getElementById("areaLocality") ? document.getElementById("areaLocality").value.trim() : "";
+        let district = document.getElementById("district") ? document.getElementById("district").value.trim() : "";
+        let pin = document.getElementById("pin") ? document.getElementById("pin").value.trim() : "";
+
+        if (!/^\d{6}$/.test(pin)) {
+            alert("Pin Code must be 6 digits");
+            return;
+        }
+
+        let qualification = document.getElementById("qualification") ? document.getElementById("qualification").value : "";
+        let steam = document.getElementById("steam") ? document.getElementById("steam").value : "";
+        let board = document.getElementById("board") ? document.getElementById("board").value.trim() : "";
+        let passingYear = document.getElementById("passingYear") ? document.getElementById("passingYear").value.trim() : "";
+        let percentage = document.getElementById("percentage") ? document.getElementById("percentage").value.trim() : "";
+
+        let editIndex = document.getElementById("editIndex") ? document.getElementById("editIndex").value : "-1";
+        let photoInput = document.getElementById("studentPhoto");
+        let photoFile = photoInput && photoInput.files ? photoInput.files[0] : null;
+
+        if (editIndex == "-1" && !photoFile) {
+            alert("Please Select Student Photo");
+            return;
+        }
+
+        let students = JSON.parse(localStorage.getItem("students")) || [];
+
+        function saveToStorage(photoBase64) {
+            let studentData = {
+                studentId: studentId ? studentId.value : "",
+                admissionDate: document.getElementById("admissionDate") ? document.getElementById("admissionDate").value : "",
+                coursetype: coursetype,
+                studentName: studentName,
+                fatherName: fatherName,
+                dob: dobFormatted,
+                mobile: mobile,
+                email: email,
+                houseNo: houseNo,
+                areaLocality: areaLocality,
+                district: district,
+                pin: pin,
+                photo: photoBase64,
+                qualification: qualification,
+                steam: steam,
+                board: board,
+                passingYear: passingYear,
+                percentage: percentage
+            };
+
+            if (editIndex == "-1") {
+                students.push(studentData);
+                serialNumber = Number(serialNumber) + 1;
+                localStorage.setItem("studentSerial", serialNumber);
+            } else {
+                students[editIndex] = studentData;
+                saveStudentBtn.innerText = "Save Student";
+            }
+
+            localStorage.setItem("students", JSON.stringify(students));
+            alert("Data Saved/Updated Successfully!");
+
+            clearForm();
+            generateStudentId();
+            showStudentList();
+        }
+
+        if (photoFile) {
+            let reader = new FileReader();
+            reader.onload = function () {
+                saveToStorage(reader.result);
+            };
+            reader.readAsDataURL(photoFile);
+        } else {
+            let oldPhoto = students[editIndex] ? students[editIndex].photo : "";
+            saveToStorage(oldPhoto);
+        }
+    });
+}
 
 // 4. SHOW STUDENT LIST FUNCTION
 function showStudentList(filteredStudents = null) {
     let studentList = document.getElementById("studentList");
     let totalCount = document.getElementById("totalCount");
-    
+
+    if (!studentList) return;
+
     let savedStudents = filteredStudents || JSON.parse(localStorage.getItem("students")) || [];
 
     if (!filteredStudents && totalCount) {
@@ -201,7 +204,7 @@ function showStudentList(filteredStudents = null) {
             "<img src='" + (student.photo || '') + "' class='studentPhoto'>" +
             "<p><b>Student ID:</b> " + (student.studentId || '') + "</p>" +
             "<p><b>Course Type:</b> " + (student.coursetype || 'N/A') + "</p>" +
-            "<p><b>Admission Date :</b>" +(student.admissionDate || 'N/A') + "</p>" +
+            "<p><b>Admission Date :</b>" + (student.admissionDate || 'N/A') + "</p>" +
             "<p><b>Student Name:</b> " + (student.studentName || '') + "</p>" +
             "<p><b>Father Name:</b> " + (student.fatherName || '') + "</p>" +
             "<p><b>Mobile:</b> " + (student.mobile || '') + "</p>" +
@@ -242,24 +245,24 @@ function editStudent(index) {
     let savedStudents = JSON.parse(localStorage.getItem("students")) || [];
     let student = savedStudents[index];
 
-    document.getElementById("studentId").value = student.studentId || "";
-    document.getElementById("courseName").value = student.coursetype || "";
-    document.getElementById("studentName").value = student.studentName || "";
-    document.getElementById("fatherName").value = student.fatherName || "";
-    document.getElementById("mobile").value = student.mobile || "";
-    document.getElementById("email").value = student.email || "";
-    document.getElementById("houseNo").value = student.houseNo || "";
-    document.getElementById("areaLocality").value = student.areaLocality || "";
-    document.getElementById("district").value = student.district || "";
-    document.getElementById("pin").value = student.pin || "";
-    document.getElementById("qualification").value = student.qualification || "";
-    document.getElementById("steam").value = student.steam || "";
-    document.getElementById("board").value = student.board || "";
-    document.getElementById("passingYear").value = student.passingYear || "";
-    document.getElementById("percentage").value = student.percentage || "";
+    if (document.getElementById("studentId")) document.getElementById("studentId").value = student.studentId || "";
+    if (document.getElementById("courseName")) document.getElementById("courseName").value = student.coursetype || "";
+    if (document.getElementById("studentName")) document.getElementById("studentName").value = student.studentName || "";
+    if (document.getElementById("fatherName")) document.getElementById("fatherName").value = student.fatherName || "";
+    if (document.getElementById("mobile")) document.getElementById("mobile").value = student.mobile || "";
+    if (document.getElementById("email")) document.getElementById("email").value = student.email || "";
+    if (document.getElementById("houseNo")) document.getElementById("houseNo").value = student.houseNo || "";
+    if (document.getElementById("areaLocality")) document.getElementById("areaLocality").value = student.areaLocality || "";
+    if (document.getElementById("district")) document.getElementById("district").value = student.district || "";
+    if (document.getElementById("pin")) document.getElementById("pin").value = student.pin || "";
+    if (document.getElementById("qualification")) document.getElementById("qualification").value = student.qualification || "";
+    if (document.getElementById("steam")) document.getElementById("steam").value = student.steam || "";
+    if (document.getElementById("board")) document.getElementById("board").value = student.board || "";
+    if (document.getElementById("passingYear")) document.getElementById("passingYear").value = student.passingYear || "";
+    if (document.getElementById("percentage")) document.getElementById("percentage").value = student.percentage || "";
 
-    document.getElementById("editIndex").value = index;
-    saveStudentBtn.innerText = "Update Student";
+    if (document.getElementById("editIndex")) document.getElementById("editIndex").value = index;
+    if (saveStudentBtn) saveStudentBtn.innerText = "Update Student";
 
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
@@ -272,7 +275,7 @@ if (searchInput) {
 
         let filtered = allStudents.filter(function (student) {
             return (student.studentName && student.studentName.toLowerCase().includes(query)) ||
-                   (student.studentId && student.studentId.toLowerCase().includes(query));
+                (student.studentId && student.studentId.toLowerCase().includes(query));
         });
 
         showStudentList(filtered);
@@ -282,11 +285,11 @@ if (searchInput) {
 // Initial Load
 showStudentList();
 
-// PRINT ID CARD FUNCTION
+// 7. PRINT ID CARD FUNCTION
 function printIDCard(index) {
     let savedStudents = JSON.parse(localStorage.getItem("students")) || [];
     let student = savedStudents[index];
-    let logoUrl = student.instituteLogo || "https://via.placeholder.com/60?text=LOGO"; 
+    let logoUrl = student.instituteLogo || "https://via.placeholder.com/60?text=LOGO";
 
     let printWindow = window.open("", "", "width=850,height=650");
     printWindow.document.write(`
@@ -341,11 +344,9 @@ function printIDCard(index) {
                             <td><b>${student.studentId}</b></td>
                         </tr>
                         <tr>
-                        <td class="label"> Admission Date:</td>
-                        <td>${student.admissionDate || ''}<td>
+                            <td class="label">Admission Date:</td>
+                            <td>${student.admissionDate || ''}</td>
                         </tr>
-                        
-                        
                         <tr>
                             <td class="label">Course Type:</td>
                             <td>${student.coursetype || ''}</td>
@@ -386,42 +387,96 @@ function printIDCard(index) {
     `);
     printWindow.document.close();
 }
-// 1. फॉर्म को सेलेक्ट करें
+
+// 8. ADMISSION FORM SUBMIT HANDLER (Backend / API Integration)
 let admissionForm = document.getElementById("admissionForm");
 
-// 2. फॉर्म सबमिट होने पर चलने वाला फ़ंक्शन
-admissionForm.addEventListener("submit", function (e) {
-    // पेज रिफ्रेश होने से रोकें
-    e.preventDefault();
+if (admissionForm) {
+    admissionForm.addEventListener("submit", async function (event) {
+        event.preventDefault();
 
-    // इनपुट फ़ील्ड्स से वैल्यू निकालें
-    let idValue = document.getElementById("studentId").value.trim().toUpperCase();
-    let nameValue = document.getElementById("studentName").value.trim();
-    let courseValue = document.getElementById("courseType").value;
+        let nameVal = document.getElementById("studentName") ? document.getElementById("studentName").value : "";
+        let rollVal = document.getElementById("studentId") || document.getElementById("rollNo") ? (document.getElementById("studentId") || document.getElementById("rollNo")).value : "";
+        let courseVal = document.getElementById("course") ? document.getElementById("course").value : "";
 
-    if (idValue === "" || nameValue === "") {
-        alert("कृपया सभी जानकारी भरें!");
-        return;
+        let totalFeeVal = Number(document.getElementById("totalFees")?.value || document.getElementById("totalFee")?.value || 0);
+        let paidFeeVal = Number(document.getElementById("receivedFees")?.value || document.getElementById("paidFee")?.value || 0);
+        let dueFeeVal = Number(document.getElementById("balanceFees")?.value || document.getElementById("dueFee")?.value || (totalFeeVal - paidFeeVal));
+
+        if (!nameVal) {
+            alert("कृपया छात्र का नाम भरें!");
+            return;
+        }
+
+        let studentData = {
+            name: nameVal,
+            rollNo: rollVal,
+            course: courseVal,
+            totalFee: totalFeeVal,
+            paidFee: paidFeeVal,
+            dueFee: dueFeeVal
+        };
+
+        try {
+            let response = await fetch('http://localhost:5000/api/students', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(studentData)
+            });
+
+            let result = await response.json();
+
+            if (result.success) {
+                alert("✅ छात्र का रिकॉर्ड और फ़ीस डेटा सफलतापूर्वक सेव हो गया!");
+                admissionForm.reset();
+                if (typeof loadStudentReport === 'function') {
+                    loadStudentReport();
+                }
+            } else {
+                alert("❌ एरर: " + result.message);
+            }
+        } catch (error) {
+            console.error("Error saving student:", error);
+            alert("❌ सर्वर से कनेक्ट नहीं हो सका!");
+        }
+    });
+}
+
+// 9. LOAD STUDENT REPORT FUNCTION
+async function loadStudentReport() {
+    let tableBody = document.getElementById("studentTableBody");
+    if (!tableBody) return;
+
+    try {
+        let response = await fetch('http://localhost:5000/api/students');
+        let result = await response.json();
+
+        if (result.success && result.data.length > 0) {
+            tableBody.innerHTML = "";
+
+            result.data.forEach(student => {
+                let dueColor = student.dueFee > 0 ? "red" : "green";
+
+                let row = `
+                    <tr>
+                        <td>${student.rollNo || '-'}</td>
+                        <td><b>${student.name}</b></td>
+                        <td>${student.course || '-'}</td>
+                        <td>₹${student.totalFee || 0}</td>
+                        <td style="color: green;">₹${student.paidFee || 0}</td>
+                        <td style="color: ${dueColor};">₹${student.dueFee || 0}</td>
+                    </tr>
+                `;
+                tableBody.innerHTML += row;
+            });
+        } else {
+            tableBody.innerHTML = `<tr><td colspan="6" style="text-align:center;">डेटाबेस में अभी कोई स्टूडेंट दर्ज नहीं है।</td></tr>`;
+        }
+    } catch (error) {
+        console.error("Data load error:", error);
+        tableBody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:red;">सर्वर कनेक्ट नहीं हुआ (node server.js चेक करें)</td></tr>`;
     }
+}
 
-    // नया स्टूडेंट ऑब्जेक्ट बनाएं
-    let newStudent = {
-        studentId: idValue,
-        studentName: nameValue,
-        coursetype: courseValue
-    };
-
-    // पुरानी लिस्ट निकालें या खाली Array लें
-    let students = JSON.parse(localStorage.getItem("students")) || [];
-
-    // नया स्टूडेंट जोड़ें
-    students.push(newStudent);
-
-    // localStorage में सेव करें
-    localStorage.setItem("students", JSON.stringify(students));
-
-    alert("स्टूडेंट " + idValue + " सफलतापूर्वक सेव हो गया!");
-    
-    // फॉर्म खाली करें
-    admissionForm.reset();
-});
+// Page load initialization
+window.addEventListener("DOMContentLoaded", loadStudentReport);
