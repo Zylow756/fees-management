@@ -1,126 +1,440 @@
-
 require("dotenv").config();
-const DB_URI = process.env.MONGO_URI;
 
+const express = require("express");
+const mongoose = require("mongoose");
+const cors = require("cors");
+const dns = require("dns");
 
-const express = require('express');
-const mongoose = require('mongoose');
-const cors = require('cors');
-const dns = require('dns');
-
-// Windows/ISP DNS Lookup समस्या हल करने के लिए IPv4 फ़ोर्स करें
-dns.setDefaultResultOrder('ipv4first');
+// IPv4 force
+dns.setDefaultResultOrder("ipv4first");
 
 const app = express();
-app.use(cors());
-app.use(express.json());
 
-// Direct Shard Strings with Fallback Options
+// ===============================
+// Middleware
+// ===============================
+app.use(cors());
+app.use(express.json({ limit: "10mb" }));
+
+
+// ===============================
+// MongoDB Connection
+// ===============================
+const DB_URI = process.env.MONGO_URI;
+
+if (!DB_URI) {
+    console.error("❌ MONGO_URI .env file में नहीं मिला!");
+    process.exit(1);
+}
 
 mongoose.connect(DB_URI, {
-    family: 4, 
+    family: 4,
     serverSelectionTimeoutMS: 10000
 })
-.then(() => console.log('✅ MongoDB Atlas Connected Successfully!'))
-.catch(err => console.error('❌ MongoDB Connection Error:', err));
+.then(() => {
+    console.log("✅ MongoDB Atlas Connected Successfully!");
+    console.log("📦 DATABASE:", mongoose.connection.name);
+})
+.catch((err) => {
+    console.error("❌ MongoDB Connection Error:", err);
+});
 
 
-
-// Student Schema & Model
+// ===============================
+// Student Schema
+// ===============================
 const studentSchema = new mongoose.Schema({
-    rollNo: { type: String, required: true },
-    name: { type: String },
-    course: { type: String },
-    totalFee: { type: Number, default: 0 },
-    paidFee: { type: Number, default: 0 },
-    dueFee: { type: Number, default: 0 },
-    feeDetails: { type: Object, default: {} }
-});
 
-const Student = mongoose.models.Student || mongoose.model('Student', studentSchema);
+    studentId: {
+        type: String,
+        required: true
+    },
 
-// 1. Get All Students Route
-app.get('/api/students', async (req, res) => {
-    try {
-        const students = await Student.find();
-        res.status(200).json({ success: true, data: students });
-    } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
+    admissionDate: {
+        type: String,
+        default: ""
+    },
+
+    coursetype: {
+        type: String,
+        default: ""
+    },
+
+    studentName: {
+        type: String,
+        required: true
+    },
+
+    fatherName: {
+        type: String,
+        default: ""
+    },
+
+    dob: {
+        type: String,
+        default: ""
+    },
+
+    mobile: {
+        type: String,
+        default: ""
+    },
+
+    email: {
+        type: String,
+        default: ""
+    },
+
+    houseNo: {
+        type: String,
+        default: ""
+    },
+
+    areaLocality: {
+        type: String,
+        default: ""
+    },
+
+    district: {
+        type: String,
+        default: ""
+    },
+
+    pin: {
+        type: String,
+        default: ""
+    },
+
+    photo: {
+        type: String,
+        default: ""
+    },
+
+    qualification: {
+        type: String,
+        default: ""
+    },
+
+    steam: {
+        type: String,
+        default: ""
+    },
+
+    board: {
+        type: String,
+        default: ""
+    },
+
+    passingYear: {
+        type: String,
+        default: ""
+    },
+
+    percentage: {
+        type: String,
+        default: ""
+    },
+
+    totalFee: {
+        type: Number,
+        default: 0
+    },
+
+    paidFee: {
+        type: Number,
+        default: 0
+    },
+
+    dueFee: {
+        type: Number,
+        default: 0
+    },
+
+    feeDetails: {
+        type: Object,
+        default: {}
     }
+
 });
 
-// 2. Search Student API Route
-app.get('/api/students/:id', async (req, res) => {
-    try {
-        const studentId = decodeURIComponent(req.params.id).trim();
+// ===============================
+// Student Model
+// ===============================
+const Student =
+    mongoose.models.Student ||
+    mongoose.model("Student", studentSchema);
 
-        const student = await Student.findOne({
-            $or: [
-                { rollNo: studentId },
-                { studentId: studentId },
-                { registrationNo: studentId }
-            ]
+    console.log("DATABASE:", mongoose.connection.name);
+console.log("COLLECTION:", Student.collection.name);
+
+// ======================================================
+// 0. SAVE NEW STUDENT
+// ======================================================
+
+app.post("/api/students", async (req, res) => {
+
+    try {
+
+       const {
+    studentId,
+    studentName,
+    admissionDate,
+    coursetype,
+    fatherName,
+    dob,
+    mobile,
+    email,
+    houseNo,
+    areaLocality,
+    district,
+    pin,
+    photo,
+    qualification,
+    steam,
+    board,
+    passingYear,
+    percentage
+} = req.body;
+
+        console.log("📝 New Student:", req.body);
+
+        if (!studentName || !studentId) {
+            return res.status(400).json({
+                success: false,
+                message: "Student name और Student ID जरूरी है"
+            });
+        }
+
+        const student = new Student({
+    studentId: studentId,
+    studentName: studentName,
+    admissionDate: admissionDate || "",
+    coursetype: coursetype || "",
+    fatherName: fatherName || "",
+    dob: dob || "",
+    mobile: mobile || "",
+    email: email || "",
+    houseNo: houseNo || "",
+    areaLocality: areaLocality || "",
+    district: district || "",
+    pin: pin || "",
+    photo: photo || "",
+    qualification: qualification || "",
+    steam: steam || "",
+    board: board || "",
+    passingYear: passingYear || "",
+    percentage: percentage || ""
+});
+        const savedStudent = await student.save();
+
+        console.log("✅ Student Saved:", savedStudent);
+
+        res.status(201).json({
+            success: true,
+            message: "Student successfully saved",
+            data: savedStudent
+        });
+
+    } catch (error) {
+
+        console.error("❌ Save Student Error:", error);
+
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+
+    }
+
+});
+// ======================================================
+// 1. GET ALL STUDENTS
+// ======================================================
+app.get("/api/students", async (req, res) => {
+
+    try {
+
+        const students = await Student.find().sort({
+            _id: -1
+        });
+
+        res.status(200).json({
+            success: true,
+            data: students
+        });
+
+    } catch (error) {
+
+        console.error("❌ Get Students Error:", error);
+
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+
+    }
+
+});
+
+
+// ======================================================
+// 2. SEARCH STUDENT BY ID / ROLL NO
+// ======================================================
+app.get("/api/students/:studentId", async (req, res) => {
+
+    try {
+
+        const studentId =
+            decodeURIComponent(req.params.studentId).trim();
+
+        console.log("🔍 Searching Student ID:", studentId);
+
+       const student = await Student.findOne({
+    $or: [
+        { rollNo: studentId },
+        { studentId: studentId }
+    ]
+
         });
 
         if (!student) {
-            return res.status(404).json({ success: false, message: 'स्टूडेंट नहीं मिला!' });
+
+            console.log("❌ Student not found:", studentId);
+
+            return res.status(404).json({
+                success: false,
+                message: "Student not found"
+            });
+
         }
 
-        res.status(200).json({ success: true, data: student });
+        console.log("✅ Student found:", student);
+
+        res.status(200).json({
+            success: true,
+            data: student
+        });
+
     } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
+
+        console.error("❌ Student Search Error:", error);
+
+        res.status(500).json({
+            success: false,
+            message: "Server error",
+            error: error.message
+        });
+
     }
+
 });
 
-// 3. Payment Update API Route
-app.put('/api/students/:id/pay', async (req, res) => {
-    try {
-        const studentId = decodeURIComponent(req.params.id).trim();
-        const { feeDetails, paidFee, dueFee } = req.body;
 
-        const updatedStudent = await Student.findOneAndUpdate(
-            { $or: [{ rollNo: studentId }, { studentId: studentId }] },
-            { 
-                $set: { 
-                    feeDetails: feeDetails,
-                    paidFee: paidFee,
-                    dueFee: dueFee
-                } 
-            },
-            { new: true }
-        );
+// ======================================================
+// 3. PAYMENT UPDATE API
+// ======================================================
+app.put("/api/students/:id/pay", async (req, res) => {
+
+    try {
+
+        const studentId =
+            decodeURIComponent(req.params.id).trim();
+
+        const {
+            feeDetails,
+            paidFee,
+            dueFee
+        } = req.body;
+
+        console.log("💰 Payment Update Request:");
+        console.log("Student ID:", studentId);
+        console.log("Paid Fee:", paidFee);
+        console.log("Due Fee:", dueFee);
+
+        const updatedStudent =
+            await Student.findOneAndUpdate(
+
+                {
+                    $or: [
+                        {
+                            rollNo: studentId
+                        },
+                        {
+                            studentId: studentId
+                        }
+                    ]
+                },
+
+                {
+                    $set: {
+                        feeDetails: feeDetails || {},
+                        paidFee: Number(paidFee) || 0,
+                        dueFee: Number(dueFee) || 0
+                    }
+                },
+
+                {
+                    new: true,
+                    runValidators: true
+                }
+
+            );
+
 
         if (!updatedStudent) {
-            return res.status(404).json({ success: false, message: 'स्टूडेंट नहीं मिला!' });
+
+            console.log(
+                "❌ Payment Student not found:",
+                studentId
+            );
+
+            return res.status(404).json({
+                success: false,
+                message: "स्टूडेंट नहीं मिला!"
+            });
+
         }
 
-        res.status(200).json({ success: true, data: updatedStudent });
-    } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
-    }
-});
 
-// 4. Test Student Add Route
-app.get('/api/test-add', async (req, res) => {
-    try {
-        const newStudent = new Student({
-            rollNo: "DAS/092026/001",
-            name: "Rahul Sharma",
-            course: "Manual & Computerized Accounting",
-            totalFee: 15000,
-            paidFee: 5000,
-            dueFee: 10000,
-            feeDetails: {}
+        console.log(
+            "✅ Payment Updated:",
+            updatedStudent.rollNo
+        );
+
+
+        res.status(200).json({
+            success: true,
+            message: "Payment successfully update हो गया!",
+            data: updatedStudent
         });
-        await newStudent.save();
-        res.status(200).json({ success: true, message: "Test Student Created!", data: newStudent });
+
+
     } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
+
+        console.error(
+            "❌ Payment Update Error:",
+            error
+        );
+
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+
     }
+
 });
 
-// Server Start
+
+// ======================================================
+// 4. SERVER START
+// ======================================================
 const PORT = process.env.PORT || 5000;
+
 app.listen(PORT, () => {
-    console.log(`🚀 Server running on port ${PORT}`);
+
+    console.log(
+        `🚀 Server running on port ${PORT}`
+    );
+
 });

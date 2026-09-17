@@ -121,44 +121,116 @@ if (saveStudentBtn) {
 
         let students = JSON.parse(localStorage.getItem("students")) || [];
 
-        function saveToStorage(photoBase64) {
-            let studentData = {
-                studentId: studentId ? studentId.value : "",
-                admissionDate: document.getElementById("admissionDate") ? document.getElementById("admissionDate").value : "",
-                coursetype: coursetype,
-                studentName: studentName,
-                fatherName: fatherName,
-                dob: dobFormatted,
-                mobile: mobile,
-                email: email,
-                houseNo: houseNo,
-                areaLocality: areaLocality,
-                district: district,
-                pin: pin,
-                photo: photoBase64,
-                qualification: qualification,
-                steam: steam,
-                board: board,
-                passingYear: passingYear,
-                percentage: percentage
-            };
+        async function saveToStorage(photoBase64) {
 
-            if (editIndex == "-1") {
-                students.push(studentData);
-                serialNumber = Number(serialNumber) + 1;
-                localStorage.setItem("studentSerial", serialNumber);
-            } else {
-                students[editIndex] = studentData;
-                saveStudentBtn.innerText = "Save Student";
+    let studentData = {
+
+        studentId: studentId ? studentId.value : "",
+
+        admissionDate:
+            document.getElementById("admissionDate")
+                ? document.getElementById("admissionDate").value
+                : "",
+
+        coursetype: coursetype,
+
+        studentName: studentName,
+
+        fatherName: fatherName,
+
+        dob: dobFormatted,
+
+        mobile: mobile,
+
+        email: email,
+
+        houseNo: houseNo,
+
+        areaLocality: areaLocality,
+
+        district: district,
+
+        pin: pin,
+
+        photo: photoBase64,
+
+        qualification: qualification,
+
+        steam: steam,
+
+        board: board,
+
+        passingYear: passingYear,
+
+        percentage: percentage
+    };
+
+
+    console.log("📤 Sending Student to MongoDB:");
+    console.log(studentData);
+
+
+    try {
+
+        const response = await fetch(
+            "http://localhost:5000/api/students",
+            {
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify(studentData)
             }
+        );
 
-            localStorage.setItem("students", JSON.stringify(students));
-            alert("Data Saved/Updated Successfully!");
 
-            clearForm();
-            generateStudentId();
-            showStudentList();
+        const result = await response.json();
+
+
+        console.log("📥 Server Response:");
+        console.log(result);
+
+
+        if (!response.ok || !result.success) {
+
+            alert(
+                "❌ Student Save Error: " +
+                (result.message || "Unknown error")
+            );
+
+            return;
         }
+
+
+        alert("✅ Student MongoDB में Successfully Save हो गया!");
+
+
+        // Serial number आगे बढ़ाएँ
+        serialNumber = Number(serialNumber) + 1;
+
+        localStorage.setItem(
+            "studentSerial",
+            serialNumber
+        );
+
+
+          clearForm();
+
+        generateStudentId();
+
+        showStudentList();
+
+    } catch (error) {
+
+        console.error("❌ MongoDB Save Error:", error);
+
+        alert("❌ MongoDB Server से connect नहीं हो सका!");
+
+    }
+}
+
 
         if (photoFile) {
             let reader = new FileReader();
@@ -174,17 +246,38 @@ if (saveStudentBtn) {
 }
 
 // 4. SHOW STUDENT LIST FUNCTION
+
+async function loadStudentsFromMongoDB() {
+    try {
+        const response = await fetch("http://localhost:5000/api/students");
+
+        const students = await response.json();
+
+        console.log("📥 MongoDB Students:", students);
+        window.mongoStudents = students.data;
+
+        if (!response.ok) {
+            console.error("❌ MongoDB Students Load Error:", students);
+            return;
+        }
+
+        showStudentList(students.data);
+
+    } catch (error) {
+        console.error("❌ MongoDB Server Error:", error);
+    }
+}
+
+
 function showStudentList(filteredStudents = null) {
     let studentList = document.getElementById("studentList");
     let totalCount = document.getElementById("totalCount");
 
     if (!studentList) return;
 
-    let savedStudents = filteredStudents || JSON.parse(localStorage.getItem("students")) || [];
-
+    let savedStudents = filteredStudents || window.mongoStudents || JSON.parse(localStorage.getItem("students")) || [];
     if (!filteredStudents && totalCount) {
-        let allStudents = JSON.parse(localStorage.getItem("students")) || [];
-        totalCount.innerText = allStudents.length;
+       totalCount.innerText = savedStudents.length;
     }
 
     studentList.innerHTML = "";
@@ -480,3 +573,5 @@ async function loadStudentReport() {
 
 // Page load initialization
 window.addEventListener("DOMContentLoaded", loadStudentReport);
+
+loadStudentsFromMongoDB();
